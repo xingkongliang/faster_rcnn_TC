@@ -10,7 +10,7 @@ opts.gpu_id                 = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
 
 opts.per_nms_topN           = 6000;
-opts.nms_overlap_thres      = 0.7;
+opts.nms_overlap_thres      = 0.3;
 opts.after_nms_topN         = 300;
 opts.use_gpu                = true;
 
@@ -64,7 +64,7 @@ for j = 1:2 % we warm up 2 times
 end
 
 %% -------------------- TESTING --------------------
-im_names = {'001763.jpg', '004545.jpg', '000542.jpg', '000456.jpg', '001150.jpg'};
+im_names = {'PL01.jpg','PL02.jpg','PL03.jpg','PL04.jpg','PL05.jpg','PL06.jpg','PL07.jpg'};
 % these images can be downloaded with fetch_faster_rcnn_final_model.m
 
 running_time = [];
@@ -113,6 +113,7 @@ for j = 1:length(im_names)
     end
     figure(j);
     showboxes(im, boxes_cell, classes, 'voc');
+    saveas(gca,['Result_imgs/PL_Pizza_Faster_RCNN_vgg16_PASCAL_MODEL/Faster_RCNN_',num2str(j)],'jpg');
     pause(0.1);
 end
 fprintf('mean time: %.3fs\n', mean(running_time));

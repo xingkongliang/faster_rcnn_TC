@@ -1,4 +1,4 @@
-function imdb = imdb_from_voc(root_dir, image_set, year, flip)
+function imdb = imdb_from_voc(root_dir, dataset_name, image_set, year, flip)
 % imdb = imdb_from_voc(root_dir, image_set, year)
 %   Builds an image database for the PASCAL VOC devkit located
 %   at root_dir using the image_set and year.
@@ -30,8 +30,12 @@ function imdb = imdb_from_voc(root_dir, image_set, year, flip)
 if nargin < 4
     flip = false;
 end
+if strcmp(dataset_name,'voc')
+    cache_file = ['./imdb/cache/imdb_voc_' year '_' image_set];
+else
+    cache_file = ['./imdb/cache/imdb_' dataset_name '_' image_set];
+end
 
-cache_file = ['./imdb/cache/imdb_voc_' year '_' image_set];
 if flip
     cache_file = [cache_file, '_flip'];
 end
@@ -40,8 +44,11 @@ try
 catch
   VOCopts = get_voc_opts(root_dir);
   VOCopts.testset = image_set;
-
-  imdb.name = ['voc_' year '_' image_set];
+  if strcmp(dataset_name,'voc')
+      imdb.name = ['voc_' year '_' image_set];
+  else   
+      imdb.name = [dataset_name '_' image_set];
+  end
   imdb.image_dir = fileparts(VOCopts.imgpath);
   imdb.image_ids = textread(sprintf(VOCopts.imgsetpath, image_set), '%s');
   imdb.extension = 'jpg';

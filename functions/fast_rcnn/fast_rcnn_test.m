@@ -72,9 +72,9 @@ function mAP = fast_rcnn_test(conf, imdb, roidb, varargin)
         disp(conf);
         
         %heuristic: keep an average of 40 detections per class per images prior to NMS
-        max_per_set = 40 * num_images;
+        max_per_set = 400 * num_images;
         % heuristic: keep at most 100 detection per class per image prior to NMS
-        max_per_image = 100;
+        max_per_image = 400;
         % detection thresold for each class (this is adaptively set based on the max_per_set constraint)
         thresh = -inf * ones(num_classes, 1);
         % top_scores will hold one minheap of scores per class (used to enforce the max_per_set constraint)
@@ -125,7 +125,13 @@ function mAP = fast_rcnn_test(conf, imdb, roidb, varargin)
                 end
                 disp(thresh);
             end    
+%             figure(1)
+%             imshow(im);
+%             for k=1:length(boxes)
+%                 rectangle('Position',[boxes(k,1),boxes(k,2),boxes(k,3)-boxes(k,1)+1,boxes(k,4)-boxes(k,2)+1]);
+%             end
         end
+        
 
         for j = 1:num_classes
             [aboxes{j}, box_inds{j}, thresh(j)] = ...

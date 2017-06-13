@@ -57,7 +57,7 @@ res_fn = sprintf(VOCopts.detrespath, res_id, cls);
 fid = fopen(res_fn, 'w');
 for i = 1:length(image_ids);
   bbox = boxes{i};
-  keep = nms(bbox, 0.3);
+  keep = nms(bbox, 0.5);
   bbox = bbox(keep,:);
   for j = 1:size(bbox,1)
     fprintf(fid, '%s %f %.3f %.3f %.3f %.3f\n', image_ids{i}, bbox(j,end), bbox(j,1:4));
@@ -70,7 +70,8 @@ prec = [];
 ap = 0;
 ap_auc = 0;
 
-do_eval = (str2num(year) <= 2007) | ~strcmp(test_set, 'test');
+% do_eval = (str2num(year) <= 2007) | ~strcmp(test_set, 'test');
+do_eval = true;
 if do_eval
   % Bug in VOCevaldet requires that tic has been called first
   tic;

@@ -16,6 +16,7 @@ external/caffe/matlab
 output/
 cachedir/
 imdb/cache
+Result_imgs
 *.caffemodel
 *.mat
 

@@ -14,8 +14,10 @@ clear is_valid_handle; % to clear init_key
 run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 opts.caffe_version          = 'caffe_faster_rcnn';
-opts.gpu_id                 = auto_select_gpu;
-active_caffe_mex(opts.gpu_id, opts.caffe_version);
+% opts.gpu_id                 = auto_select_gpu;
+% active_caffe_mex(opts.gpu_id, opts.caffe_version);
+caffe.set_mode_gpu();
+caffe.set_device(4);
 
 % model
 model                       = Model.ZF_for_Fast_RCNN_VOC2007();
