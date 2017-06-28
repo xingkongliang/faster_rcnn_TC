@@ -19,7 +19,7 @@ active_caffe_mex(opts.gpu_id, opts.caffe_version);
 % do validation, or not 
 opts.do_val                 = true; 
 if nargin<1
-    dataset_name = 'MOT16-02';
+    dataset_name = 'MOT16-04';
 end
 fprintf('dataset_name: %s \n',dataset_name);
 % model

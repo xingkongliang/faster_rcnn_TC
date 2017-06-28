@@ -55,7 +55,7 @@ sigma = 0.8;
 
 % After segmentation, filter out boxes which have a width/height smaller
 % than minBoxWidth (default = 20 pixels).
-minBoxWidth = 40;
+minBoxWidth = 20;
 maxBoxWidth = 200;
 % Comment the following three lines for the 'quality' version
 colorTypes = colorTypes(1:2); % 'Fast' uses HSV and Lab
@@ -63,7 +63,9 @@ simFunctionHandles = simFunctionHandles(1:2); % Two different merging strategies
 ks = ks(1:2);
 
 % Test the boxes
-
+if nargin < 1
+    dataset_name = 'PNNLParkingLot2';
+end
 root_dir = ['./datasets/' dataset_name '/' dataset_name];
 VOCopts = get_voc_opts(root_dir);
 VOCopts.testset = dataset_name;
@@ -72,13 +74,17 @@ image_sets = {'trainval', 'test', 'val'};
 
 for s = 1:length(image_sets)
     image_set = image_sets{s};
-    imdb.name = ['voc_' year '_' image_set];
+    if strcmp(dataset_name,'voc')
+        imdb.name = ['voc_' year '_' image_set];
+    else   
+        imdb.name = [dataset_name '_' image_set];
+    end
     imdb.image_dir = fileparts(VOCopts.imgpath);
     imdb.image_ids = textread(sprintf(VOCopts.imgsetpath, image_set), '%s');
     imdb.extension = 'jpg';
 
     image_at = @(i) sprintf('%s/%s.%s', imdb.image_dir, imdb.image_ids{i}, imdb.extension);
-    fprintf('After box extraction, boxes smaller than %d pixels will be removed\n', minBoxWidth);
+    fprintf('After box extraction, boxes smaller than %d pixels and larger than %d will be removed\n', minBoxWidth, maxBoxWidth);
     fprintf('Obtaining boxes for %s set:\n', dataset_name);
     totalTime = 0;
 
@@ -115,7 +121,7 @@ for s = 1:length(image_sets)
     %         rectangle('Position',[box(i,2),box(i,1),box(i,4)-box(i,2)+1,box(i,3)-box(i,1)+1],'EdgeColor','r','LineWidth',1);
     %     end    
     end
-    save(fullfile('./data/selective_search_data',['voc_2007_' image_set]), 'boxes', 'images');
+    save(fullfile('./data/selective_search_data',[dataset_name '_' image_set]), 'boxes', 'images');
     fprintf('\n');
     fprintf('%s is done!\n', image_set);
 end

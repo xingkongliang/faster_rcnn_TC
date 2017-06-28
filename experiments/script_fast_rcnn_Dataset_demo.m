@@ -1,4 +1,4 @@
-function script_faster_rcnn_Dataset_demo()
+function script_fast_rcnn_Dataset_demo()
 close all;
 clc;
 clear mex;

@@ -1,7 +1,7 @@
 function BackgroundImages()
 %BACKGROUNDIMAGES �˴���ʾ�йش˺����ժҪ
 %   �˴���ʾ��ϸ˵��
-datasetname = 'TownCentre';
+datasetname = 'PNNLParkingLot2';
 paras.ShowFg = false;
 devkit = ['./datasets/' datasetname '/' datasetname];
 background_image_file = [devkit '/background_image.png'];

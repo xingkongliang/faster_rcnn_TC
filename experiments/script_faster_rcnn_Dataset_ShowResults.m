@@ -1,4 +1,4 @@
-function script_faster_rcnn_demo()
+function script_faster_rcnn_Dataset_ShowResults()
 close all;
 clc;
 clear mex;
@@ -15,9 +15,10 @@ opts.after_nms_topN         = 300;
 opts.use_gpu                = true;
 
 opts.test_scales            = 600;
-
+train_dataset_name = 'MOT16-04';
+test_dataset_name = 'MOT16-03';
 %% -------------------- INIT_MODEL --------------------
-model_dir                   = fullfile(pwd, 'output', 'faster_rcnn_final', 'faster_rcnn_VOC0712_vgg_16layers'); %% VGG-16
+model_dir                   = fullfile(pwd, 'output', 'faster_rcnn_final', ['fast_rcnn_' train_dataset_name '_vgg_16layers']); %% VGG-16
 %model_dir                   = fullfile(pwd, 'output', 'faster_rcnn_final', 'faster_rcnn_VOC0712_ZF'); %% ZF
 proposal_detection_model    = load_proposal_detection_model(model_dir);
 
@@ -64,13 +65,16 @@ for j = 1:2 % we warm up 2 times
 end
 
 %% -------------------- TESTING --------------------
-im_names = {'PL01.jpg','PL02.jpg','PL03.jpg','PL04.jpg','PL05.jpg','PL06.jpg','PL07.jpg'};
+% im_names = {'PL01.jpg','PL02.jpg','PL03.jpg','PL04.jpg','PL05.jpg','PL06.jpg','PL07.jpg'};
 % these images can be downloaded with fetch_faster_rcnn_final_model.m
+fileFolder=fullfile(['/root/Cloud/Caffe_projects/faster_rcnn_TC/datasets/' test_dataset_name '/img1']);
+dirOutput=dir(fullfile(fileFolder,'*.jpg'));
+fileNames={dirOutput.name}';
 
 running_time = [];
-for j = 1:length(im_names)
+for j = 1:5:length(fileNames)
     
-    im = imread(fullfile(pwd, im_names{j}));
+    im = imread(fullfile(fileFolder, fileNames{j}));
     
     if opts.use_gpu
         im = gpuArray(im);
@@ -96,24 +100,30 @@ for j = 1:length(im_names)
     end
     t_detection = toc(th);
     
-    fprintf('%s (%dx%d): time %.3fs (resize+conv+proposal: %.3fs, nms+regionwise: %.3fs)\n', im_names{j}, ...
+    fprintf('%s (%dx%d): time %.3fs (resize+conv+proposal: %.3fs, nms+regionwise: %.3fs)\n', fileNames{j}, ...
         size(im, 2), size(im, 1), t_proposal + t_nms + t_detection, t_proposal, t_nms+t_detection);
     running_time(end+1) = t_proposal + t_nms + t_detection;
     
     % visualize
     classes = proposal_detection_model.classes;
     boxes_cell = cell(length(classes), 1);
+    nms_thres = 0.3;
     thres = 0.6;
     for i = 1:length(boxes_cell)
         boxes_cell{i} = [boxes(:, (1+(i-1)*4):(i*4)), scores(:, i)];
-        boxes_cell{i} = boxes_cell{i}(nms(boxes_cell{i}, 0.3), :);
+        boxes_cell{i} = boxes_cell{i}(nms(boxes_cell{i}, nms_thres), :);
         
         I = boxes_cell{i}(:, 5) >= thres;
         boxes_cell{i} = boxes_cell{i}(I, :);
     end
-    figure(j);
+    figure(1);
     showboxes(im, boxes_cell, classes, 'voc');
-    saveas(gca,['Result_imgs/PL_Pizza_Faster_RCNN_vgg16_PASCAL_MODEL/Faster_RCNN_',num2str(j)],'jpg');
+    SaveImagePath = sprintf('Result_imgs/%s_Faster-RCNN_vgg16_nms%.2f_thres%.2f', test_dataset_name, nms_thres, thres);
+    Result_imagepath = [SaveImagePath '/faster-RCNN_%s'];
+    if ~exist(SaveImagePath) 
+        mkdir(SaveImagePath) 
+    end
+    saveas(gca, sprintf(Result_imagepath, fileNames{j}), 'jpg');
     pause(0.1);
 end
 fprintf('mean time: %.3fs\n', mean(running_time));

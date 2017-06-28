@@ -4,7 +4,6 @@ function dataset = Dataset_trainval_ss(dataset, dataset_name, usage, use_flip)
 % or set opts.imdb_test opts.roidb_train
 
 % change to point to your devkit install
-
 devkit                      = ['./datasets/' dataset_name '/' dataset_name];
 
 switch usage
